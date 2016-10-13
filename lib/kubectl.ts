@@ -408,7 +408,7 @@ export class Kubectl {
 	 * kubernetes conveniently places in containers. Warning: this applies to
 	 * all kubectl invocations until the kubectl context is changed.
 	 */
-	private static connectToCurrentCluster(config : Config): Kubectl {
+	public static connectToCurrentCluster(config : Config): Kubectl {
 
 		let kube = new Kubectl(config);
 
