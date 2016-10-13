@@ -1,5 +1,6 @@
-const spawn = require('child_process').spawn
-const _ = require('underscore')
+import { spawn } from 'child_process';
+import * as _ from 'underscore';
+import * as fs from 'fs';
 
 import { Pod, ReplicationController, Deployment, Ingress, 
 	     DaemonSet, Service, Namespace, Secret, Endpoint, List } from './k8s-api';
@@ -401,4 +402,26 @@ export class Kubectl {
 		arguments[0] = arguments[0].split(' ')
 		return this.pod.command.apply(this.pod, arguments)
 	}
+
+	/**
+	 * Configure kubectl to discover the current cluster using the secrets 
+	 * kubernetes conveniently places in containers. Warning: this applies to
+	 * all kubectl invocations until the kubectl context is changed.
+	 */
+	private connectToCurrentCluster(): Kubectl {
+		let kube = new Kubectl({
+			binary: "/usr/local/bin/kubectl",
+			namespace: "production" // TODO
+		});
+
+		var kubeEndpoint = `https://kubernetes`;
+		var kubeToken = fs.readFileSync("/var/run/secrets/kubernetes.io/serviceaccount/token");
+
+		kube.command('config set-cluster local --server=https://kubernetes --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt');
+		kube.command('config set-context local --cluster=local --namespace=production'); 
+		kube.command(`config set-credentials local --token=${kubeToken}`);
+
+		return kube;
+	}
+
 }
