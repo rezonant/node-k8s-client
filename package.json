@@ -24,7 +24,6 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "@types/node": "^6.0.32",
     "chai": "^3.5.0",
     "concurrently": "^2.0.0",
     "fast-json-patch": "^0.5.7",
