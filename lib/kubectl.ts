@@ -94,7 +94,7 @@ export class KubectlStore<T>
         return promise
     }
 
-    public list(selector, flags?, done? : Callback<T[]>) : Promise<T[]>
+    public list(selector?, flags?, done? : Callback<T[]>) : Promise<T[]>
     {
         if( !this.type )
             throw new Error('not a function')
