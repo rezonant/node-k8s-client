@@ -59,7 +59,7 @@ export class Request
         return options
     }
 
-    public async get(url: string, done?): Promise<any>
+    public get(url: string, done?): Promise<any>
     {
         const promise = new Promise((resolve, reject) =>
         {
@@ -78,7 +78,7 @@ export class Request
     }
 
 
-    public async log(url: string, done?): Promise<any>
+    public log(url: string, done?): Promise<any>
     { 
         const promise = new Promise((resolve, reject) =>
         {
