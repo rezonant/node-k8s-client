@@ -1,7 +1,8 @@
 const spawn = require('child_process').spawn
 const _ = require('underscore')
 
-import { Pod, ReplicationController, Deployment, Ingress, DaemonSet, Service, Namespace, Secret, Endpoint } from './k8s-api';
+import { Pod, ReplicationController, Deployment, Ingress, 
+	     DaemonSet, Service, Namespace, Secret, Endpoint, List } from './k8s-api';
 
 export type Callback<T> = (err : any, data : T[]) => void;
 
@@ -94,7 +95,7 @@ export class KubectlStore<T>
         return promise
     }
 
-    public list(selector?, flags?, done? : Callback<T[]>) : Promise<T[]>
+    public list(selector?, flags?, done? : Callback<T[]>) : Promise<List<T>>
     {
         if( !this.type )
             throw new Error('not a function')
