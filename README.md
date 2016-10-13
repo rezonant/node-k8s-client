@@ -1,5 +1,6 @@
-# Nodejs Kubernetes client
+# @rezonant/k8s: Nodejs/Typescript Kubernetes library
 
+Forked from [Goyoo's version](https://github.com/Goyoo/node-k8s-client/blob/master/index.ts)
 
 Node.js client library for Google's Kubernetes Kubectl And API
 
