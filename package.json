@@ -14,10 +14,10 @@
   "typings": "index.d.ts",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test",
-    "build": "webpack",
-    "watch": "npm run build -- --watch",
-    "start": "webpack --watch"
+    "test": "tsc && mocha test",
+    "build": "tsc",
+    "watch": "nodemon -e ts --ignore \"*.d.ts\" --exec npm run build",
+    "start": "nodemon -e ts --ignore \"*.d.ts\" --exec npm test"
   },
   "dependencies": {
     "request": "^2.72.0",
