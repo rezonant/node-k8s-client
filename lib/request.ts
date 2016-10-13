@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 declare var Buffer
 
-export class Request
+export class Api
 {
     private strictSSL
     private domain
