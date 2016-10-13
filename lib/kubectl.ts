@@ -5,96 +5,6 @@ import { Pod, ReplicationController, Deployment, Ingress, DaemonSet, Service, Na
 
 export type Callback<T> = (err : any, data : T[]) => void;
 
-export class KubectlPodStore extends KubectlStore<Pod> {
-
-    public logs(name: string, flags?, done?: (err, data)=>void)
-    {
-        var action = new Array('logs')
-
-        if (name.indexOf(' ') > -1) {
-            var names = name.split(/ /)
-            action.push(names[0])
-            action.push(names[1])
-        } else {
-            action.push(name)
-        }
-
-        
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-
-        return this.command(action.concat(flags), done)
-    }
-}
-
-export class KubectlRcStore extends KubectlStore<ReplicationController>
-{
-    public rollingUpdateByFile(name: string, filepath: string, flags?, done?: (err, data)=>void)
-    {
-        if( this.type !== 'replicationcontrollers' )
-            throw new Error('not a function')
-
-        
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-        const action = ['rolling-update',  name, '-f', filepath, '--update-period=0s'].concat(flags)
-
-        return this.command(action, done)
-    }
-
-
-    public rollingUpdate(name: string, image: string, flags?, done?: (err, data)=>void)
-    {
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-
-        const action = ['rolling-update',  name, '--image=' + image, '--update-period=0s'].concat(flags)
-
-        return this.command(action, done)
-    }
-
-    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
-    {
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
-
-        return this.command(action, done)
-    }
-	
-}
-
-export class KubectlDeploymentStore extends KubectlStore<Deployment> {
-    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
-    {
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
-
-        return this.command(action, done)
-    }
-}
-
 export class KubectlStore<T>
 {
     private type
@@ -164,8 +74,8 @@ export class KubectlStore<T>
     public command(cmd : string[], callback : Callback<any>): Promise<any>
     {
         if( _.isString(cmd) )
-            cmd = cmd.split(' ')
-            
+            cmd = (<any>cmd).split(' ')
+ 
         const promise = new Promise((resolve, reject) => 
         {
             this.spawn(cmd, function(err, data)
@@ -351,6 +261,92 @@ export interface Config {
 	binary? : string;
 	kubeconfig? : string;
 	version? : string;
+}
+
+export class KubectlPodStore extends KubectlStore<Pod> {
+
+    public logs(name: string, flags?, done?: (err, data)=>void)
+    {
+        var action = new Array('logs')
+
+        if (name.indexOf(' ') > -1) {
+            var names = name.split(/ /)
+            action.push(names[0])
+            action.push(names[1])
+        } else {
+            action.push(name)
+        }
+
+        
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+
+        return this.command(action.concat(flags), done)
+    }
+}
+
+export class KubectlRcStore extends KubectlStore<ReplicationController>
+{
+    public rollingUpdateByFile(name: string, filepath: string, flags?, done?: (err, data)=>void)
+    {   
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['rolling-update',  name, '-f', filepath, '--update-period=0s'].concat(flags)
+
+        return this.command(action, done)
+    }
+
+
+    public rollingUpdate(name: string, image: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+
+        const action = ['rolling-update',  name, '--image=' + image, '--update-period=0s'].concat(flags)
+
+        return this.command(action, done)
+    }
+
+    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
+
+        return this.command(action, done)
+    }
+	
+}
+
+export class KubectlDeploymentStore extends KubectlStore<Deployment> {
+    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
+
+        return this.command(action, done)
+    }
 }
 
 export class Kubectl {

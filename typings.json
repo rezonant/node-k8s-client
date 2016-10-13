@@ -4,6 +4,7 @@
     "request": "registry:npm/request#2.69.0+20160428223725"
   },
   "globalDependencies": {
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
     "node": "registry:dt/node#6.0.0+20161010101523",
     "underscore": "registry:dt/underscore#1.8.3+20160908111004"
   }

@@ -1,12 +1,4 @@
 
-export interface Config {
-	endpoint? : string;
-	namespace? : string;
-	binary? : string;
-	kubeconfig? : string;
-	version? : string;
-}
-
 export interface List<T> {
 	kind : 'List';
 	apiVersion : string;
