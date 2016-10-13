@@ -71,7 +71,9 @@ export class KubectlStore<T>
         }
     }
 
-    public command(cmd : string[], callback : Callback<any>): Promise<any>
+    public command(cmd : string, callback? : Callback<any>): Promise<any>;
+    public command(cmd : string[], callback? : Callback<any>): Promise<any>
+    public command(cmd : any, callback? : Callback<any>): Promise<any>
     {
         if( _.isString(cmd) )
             cmd = (<any>cmd).split(' ')
