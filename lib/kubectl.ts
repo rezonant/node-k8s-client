@@ -408,17 +408,15 @@ export class Kubectl {
 	 * kubernetes conveniently places in containers. Warning: this applies to
 	 * all kubectl invocations until the kubectl context is changed.
 	 */
-	private connectToCurrentCluster(): Kubectl {
-		let kube = new Kubectl({
-			binary: "/usr/local/bin/kubectl",
-			namespace: "production" // TODO
-		});
+	private static connectToCurrentCluster(config : Config): Kubectl {
+
+		let kube = new Kubectl(config);
 
 		var kubeEndpoint = `https://kubernetes`;
 		var kubeToken = fs.readFileSync("/var/run/secrets/kubernetes.io/serviceaccount/token");
 
 		kube.command('config set-cluster local --server=https://kubernetes --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt');
-		kube.command('config set-context local --cluster=local --namespace=production'); 
+		kube.command(`config set-context local --cluster=local --namespace=${config.namespace || 'production'}`); 
 		kube.command(`config set-credentials local --token=${kubeToken}`);
 
 		return kube;
