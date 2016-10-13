@@ -6,10 +6,10 @@
   "description": "Node.js client library for Google's Kubernetes Kubectl And API",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/goyoo/node-k8s-client.git"
+    "url": "git+https://github.com/rezonant/node-k8s-client.git"
   },
   "bugs": {
-    "url": "https://github.com/goyoo/node-k8s-client/issues"
+    "url": "https://github.com/rezonant/node-k8s-client/issues"
   },
   "typings": "index.d.ts",
   "main": "index.js",
