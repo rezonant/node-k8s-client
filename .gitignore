@@ -6,3 +6,5 @@ npm-debug.log
 # Generated JS files
 index.js
 lib/*.js*
+lib/*.d.ts
+index.d.ts

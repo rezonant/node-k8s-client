@@ -10,6 +10,7 @@
   "bugs": {
     "url": "https://github.com/goyoo/node-k8s-client/issues"
   },
+  "typings": "index.d.ts",
   "main": "index.js",
   "scripts": {
     "test": "mocha test",
