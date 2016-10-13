@@ -72,7 +72,7 @@ export class KubectlStore<T>
     }
 
     public command(cmd : string, callback? : Callback<any>): Promise<any>;
-    public command(cmd : string[], callback? : Callback<any>): Promise<any>
+    public command(cmd : string[], callback? : Callback<any>): Promise<any>;
     public command(cmd : any, callback? : Callback<any>): Promise<any>
     {
         if( _.isString(cmd) )
@@ -394,7 +394,9 @@ export class Kubectl {
 	ingress : KubectlStore<Ingress>;
 	ing : KubectlStore<Ingress>;
 
-	command(cmd : string[], callback ? : Callback<any>): Promise<any> {
+    public command(cmd : string, callback? : Callback<any>): Promise<any>;
+    public command(cmd : string[], callback? : Callback<any>): Promise<any>;
+	command(cmd : any, callback? : Callback<any>): Promise<any> {
 		arguments[0] = arguments[0].split(' ')
 		return this.pod.command.apply(this.pod, arguments)
 	}
