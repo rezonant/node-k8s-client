@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "request": "^2.72.0",
-    "rx": "^4.1.0",
+    "rxjs": "^5.0.0-rc.1",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

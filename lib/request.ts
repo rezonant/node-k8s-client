@@ -1,7 +1,6 @@
-const request = require('request')
-const Rx = require('rx')
-const _ = require('underscore')
-const Observable = Rx.Observable
+import * as request from 'request';
+import * as _ from 'underscore';
+import { Observable } from 'rxjs';
 
 declare var Buffer
 
@@ -187,7 +186,7 @@ export class Request
         }
         var res
 
-        const source = Rx.Observable.create((observer)=>
+        const source = Observable.create((observer)=>
         {
             var jsonStr = ''
             res = request.get(this.getRequestOptions(url, { timeout: timeout }),function(e){ }).on('data', function(data)

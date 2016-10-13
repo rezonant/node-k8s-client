@@ -1,7 +1,101 @@
 const spawn = require('child_process').spawn
 const _ = require('underscore')
 
-class Kubectl
+import { Pod, ReplicationController, Deployment, Ingress, DaemonSet, Service, Namespace, Secret, Endpoint } from './k8s-api';
+
+export type Callback<T> = (err : any, data : T[]) => void;
+
+export class KubectlPodStore extends KubectlStore<Pod> {
+
+    public logs(name: string, flags?, done?: (err, data)=>void)
+    {
+        var action = new Array('logs')
+
+        if (name.indexOf(' ') > -1) {
+            var names = name.split(/ /)
+            action.push(names[0])
+            action.push(names[1])
+        } else {
+            action.push(name)
+        }
+
+        
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+
+        return this.command(action.concat(flags), done)
+    }
+}
+
+export class KubectlRcStore extends KubectlStore<ReplicationController>
+{
+    public rollingUpdateByFile(name: string, filepath: string, flags?, done?: (err, data)=>void)
+    {
+        if( this.type !== 'replicationcontrollers' )
+            throw new Error('not a function')
+
+        
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['rolling-update',  name, '-f', filepath, '--update-period=0s'].concat(flags)
+
+        return this.command(action, done)
+    }
+
+
+    public rollingUpdate(name: string, image: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+
+        const action = ['rolling-update',  name, '--image=' + image, '--update-period=0s'].concat(flags)
+
+        return this.command(action, done)
+    }
+
+    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
+
+        return this.command(action, done)
+    }
+	
+}
+
+export class KubectlDeploymentStore extends KubectlStore<Deployment> {
+    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
+    {
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
+
+        return this.command(action, done)
+    }
+}
+
+export class KubectlStore<T>
 {
     private type
     private binary
@@ -67,7 +161,7 @@ class Kubectl
         }
     }
 
-    public command(cmd, callback): Promise<any>
+    public command(cmd : string[], callback : Callback<any>): Promise<any>
     {
         if( _.isString(cmd) )
             cmd = cmd.split(' ')
@@ -88,7 +182,7 @@ class Kubectl
         return promise
     }
 
-    public list(selector, flags?, done?)
+    public list(selector, flags?, done? : Callback<T[]>) : Promise<T[]>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -119,7 +213,7 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public get(name: string, flags?, done?: (err, data)=>void)
+    public get(name: string, flags?, done? : Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -138,7 +232,7 @@ class Kubectl
         
     }
 
-    public create(filepath: string, flags?, done?: (err, data)=>void)
+    public create(filepath: string, flags?, done? : Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -155,7 +249,7 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public delete(id: string, flags, done?: (err, data)=>void)
+    public delete(id: string, flags, done?: Callback<void>) : Promise<void> 
     {
         if( !this.type )
             throw new Error('not a function')
@@ -172,7 +266,7 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public update(filepath: string, flags?, done?: (err, data)=>void)
+    public update(filepath: string, flags?, done?: Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -189,7 +283,7 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public apply(name: string, json: Object, flags?, done?: (err, data)=>void)
+    public apply(name: string, json: Object, flags?, done?: Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -205,85 +299,7 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public rollingUpdateByFile(name: string, filepath: string, flags?, done?: (err, data)=>void)
-    {
-        if( this.type !== 'replicationcontrollers' )
-            throw new Error('not a function')
-
-        
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-        const action = ['rolling-update',  name, '-f', filepath, '--update-period=0s'].concat(flags)
-
-        return this.command(action, done)
-    }
-
-
-    public rollingUpdate(name: string, image: string, flags?, done?: (err, data)=>void)
-    {
-        if( this.type !== 'replicationcontrollers' )
-            throw new Error('not a function') 
-        
-
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-
-        const action = ['rolling-update',  name, '--image=' + image, '--update-period=0s'].concat(flags)
-
-        return this.command(action, done)
-    }
-
-    public scale(name: string, replicas: string, flags?, done?: (err, data)=>void)
-    {
-        if( this.type !== 'replicationcontrollers' && this.type !== 'deployments' )
-            throw new Error('not a function')
-        
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-        const action = ['scale', '--replicas=' + replicas, 'replicationcontrollers', name].concat(flags)
-
-        return this.command(action, done)
-    }
-
-    public logs(name: string, flags?, done?: (err, data)=>void)
-    {
-        if( this.type !== 'pods' )
-            throw new Error('not a function')
-
-        var action = new Array('logs')
-
-        if (name.indexOf(' ') > -1) {
-            var names = name.split(/ /)
-            action.push(names[0])
-            action.push(names[1])
-        } else {
-            action.push(name)
-        }
-
-        
-        if( _.isFunction(flags) ){
-            done = flags
-            flags = null
-        }
-
-        flags = flags || []
-
-        return this.command(action.concat(flags), done)
-    }
-
-    public describe(name: string, flags?, done?: (err, data)=>void)
+    public describe(name: string, flags?, done?: Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -304,7 +320,7 @@ class Kubectl
         return this.command(action.concat(flags), done)
     }
 
-    public portForward(name: string, portString: string, done?: (err, data)=>void)
+    public portForward(name: string, portString: string, done?: Callback<void>) : Promise<void>
     {
         if( this.type !== 'pods' )
             throw new Error('not a function')
@@ -314,14 +330,14 @@ class Kubectl
         return this.command(action, done)
     }
 
-    public useContext(context: string, done?: (err, data)=>void)
+    public useContext(context: string, done?: Callback<void>) : Promise<void>
     {
         var action = new Array('config', 'use-context', context)
         
         return this.command(action, done)
     }
 
-    public viewContext(done?: (err, data)=>void)
+    public viewContext(done?: Callback<void>)
     {
         var action = new Array('config', '--output=json', 'view')
         
@@ -329,33 +345,59 @@ class Kubectl
     }
 }
 
-declare function require(name:string)
+export interface Config {
+	endpoint? : string;
+	namespace? : string;
+	binary? : string;
+	kubeconfig? : string;
+	version? : string;
+}
 
-export = (conf)=>
-{
-	return {
-    // short names are just aliases to longer names
-		pod: new Kubectl('pods', conf)
-		, po: new Kubectl('pods', conf)
-		, replicationcontroller: new Kubectl('replicationcontrollers', conf)
-		, rc: new Kubectl('replicationcontrollers', conf)
-		, service: new Kubectl('services', conf)
-		, svc: new Kubectl('services', conf)
-		, node: new Kubectl('nodes', conf)
-		, no: new Kubectl('nodes', conf)
-		, namespace: new Kubectl('namespaces', conf)
-		, ns: new Kubectl('namespaces', conf)
-		, deployment: new Kubectl('deployments', conf)
-		, daemonset: new Kubectl('daemonsets', conf)
-		, ds: new Kubectl('daemonsets', conf)
-		, secrets: new Kubectl('secrets', conf)
-		, endpoint: new Kubectl('endpoints', conf)
-		, ep: new Kubectl('endpoints', conf)
-		, ingress: new Kubectl('ingress', conf)
-		, ing: new Kubectl('ingress', conf)
-        , command: function(){
-            arguments[0] = arguments[0].split(' ')
-            return this.pod.command.apply(this.pod, arguments)
-        }
+export class Kubectl {
+	constructor(private config : Config) {
+
+		this.pod = new KubectlStore<Pod>('pods', config);
+		this.po = new KubectlStore<Pod>('pods', config);
+		this.replicationcontroller = new KubectlStore<ReplicationController>('replicationcontrollers', config);
+		this.rc = new KubectlStore<ReplicationController>('replicationcontrollers', config);
+		this.service = new KubectlStore<Service>('services', config);
+		this.svc = new KubectlStore<Service>('services', config);
+		this.node = new KubectlStore<Node>('nodes', config);
+		this.no = new KubectlStore<Node>('nodes', config);
+		this.namespace = new KubectlStore<Namespace>('namespaces', config);
+		this.ns = new KubectlStore<Namespace>('namespaces', config);
+		this.deployment = new KubectlStore<Deployment>('deployments', config);
+		this.daemonset = new KubectlStore<DaemonSet>('daemonsets', config);
+		this.ds = new KubectlStore<DaemonSet>('daemonsets', config);
+		this.secrets = new KubectlStore<Secret>('secrets', config);
+		this.endpoint = new KubectlStore<Endpoint>('endpoints', config);
+		this.ep = new KubectlStore<Endpoint>('endpoints', config);
+		this.ingress = new KubectlStore<Ingress>('ingress', config);
+		this.ing = new KubectlStore<Ingress>('ingress', config);
+
+	}
+
+	pod : KubectlStore<Pod>;
+	po : KubectlStore<Pod>;
+	replicationcontroller : KubectlStore<ReplicationController>;
+	rc : KubectlStore<ReplicationController>;
+	service : KubectlStore<Service>;
+	svc : KubectlStore<Service>;
+	node : KubectlStore<Node>;
+	no : KubectlStore<Node>;
+	namespace : KubectlStore<Namespace>;
+	ns : KubectlStore<Namespace>;
+	deployment : KubectlStore<Deployment>;
+	daemonset : KubectlStore<DaemonSet>;
+	ds : KubectlStore<DaemonSet>;
+	secrets : KubectlStore<Secret>;
+	endpoint : KubectlStore<Endpoint>;
+	ep : KubectlStore<Endpoint>;
+	ingress : KubectlStore<Ingress>;
+	ing : KubectlStore<Ingress>;
+
+	command(cmd : string[], callback ? : Callback<any>): Promise<any> {
+		arguments[0] = arguments[0].split(' ')
+		return this.pod.command.apply(this.pod, arguments)
 	}
 }
