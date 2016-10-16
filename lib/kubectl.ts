@@ -31,7 +31,7 @@ export class KubectlStore<T>
         if( this.kubeconfig ){
             ops.push('--kubeconfig='+this.kubeconfig)
         }
-        else {
+        else if (this.endpoint) {
             ops.push('-s')
             ops.push(this.endpoint)
         }
