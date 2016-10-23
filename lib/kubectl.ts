@@ -54,7 +54,7 @@ export class KubectlStore<T>
         
         kube.on('close', function (code) 
         {
-            if( !stderr.length )
+			if (code == 0)
                 return done(null, stdout.join(''))
 
             done(stderr.join(''))
