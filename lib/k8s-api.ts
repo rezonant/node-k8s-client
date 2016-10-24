@@ -88,6 +88,64 @@ export interface Pod {
 	status : PodStatus;
 }
 
+export interface PvcSpecRequestResources {
+	storage? : string;
+}
+
+export interface PvcSpecResources {
+	requests? : PvcSpecRequestResources;
+}
+
+export interface PvcSpec {
+	accessModes? : string[]
+	resources? : PvcSpecResources;
+	selector : any;
+}
+
+export type PvcStatusPhase = "Pending" | "Bound";
+
+export interface PvcStatus {
+	phase : PvcStatusPhase;
+}
+
+export interface PersistentVolumeClaim {
+	kind : "PersistentVolumeClaim";
+	apiVersion : string;
+	metadata : Metadata;
+	spec : PodSpec;
+	status : PvcStatus;
+}
+
+export interface PvSpecCapacity {
+	storage : string;
+}
+
+export interface PvNfsSpec {
+	path : string;
+	server : string;
+}
+
+export interface PvSpec {
+	capacity : PvSpecCapacity;
+	accessModes : string[]
+	persistentVolumeReclaimPolicy : string;
+	nfs? : PvNfsSpec;
+}
+
+export type PvStatusPhase = "Available" | "Bound" | "Released" | "Failed"
+
+export interface PvStatus {
+	phase : PvStatusPhase;
+}
+
+export interface PersistentVolume {
+	kind : "PersistentVolume";
+	apiVersion : string;
+	metadata : Metadata;
+	spec : PvSpec;
+	status : PvStatus;
+}
+
 export interface ReplicatedPodSpec extends PodSpec {
 	restartPolicy : "Always" | "Never";
 	terminationGracePeriodSeconds : number;

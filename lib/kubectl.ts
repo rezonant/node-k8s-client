@@ -3,7 +3,7 @@ import * as _ from 'underscore';
 import * as fs from 'fs';
 
 import { Pod, ReplicationController, Deployment, Ingress, 
-	     DaemonSet, Service, Namespace, Secret, Endpoint, List } from './k8s-api';
+	     DaemonSet, Service, Namespace, Secret, Endpoint, List, PersistentVolumeClaim, PersistentVolume } from './k8s-api';
 
 export type Callback<T> = (err : any, data : T[]) => void;
 
@@ -374,7 +374,10 @@ export class Kubectl {
 		this.ep = new KubectlStore<Endpoint>('endpoints', config);
 		this.ingress = new KubectlStore<Ingress>('ingress', config);
 		this.ing = new KubectlStore<Ingress>('ingress', config);
-
+		this.pvc = new KubectlStore<PersistentVolumeClaim>('pvc', config);
+		this.persistentvolumeclaim = new KubectlStore<PersistentVolumeClaim>('pvc', config);
+		this.pv = new KubectlStore<PersistentVolume>('pv', config);
+		this.persistentvolume = new KubectlStore<PersistentVolume>('pv', config);
 	}
 
 	pod : KubectlStore<Pod>;
@@ -395,6 +398,12 @@ export class Kubectl {
 	ep : KubectlStore<Endpoint>;
 	ingress : KubectlStore<Ingress>;
 	ing : KubectlStore<Ingress>;
+
+	pvc : KubectlStore<PersistentVolumeClaim>;
+	persistentvolumeclaim : KubectlStore<PersistentVolumeClaim>;
+
+	pv : KubectlStore<PersistentVolume>;
+	persistentvolume : KubectlStore<PersistentVolume>; 
 
     public command(cmd : string, callback? : Callback<any>): Promise<any>;
     public command(cmd : string[], callback? : Callback<any>): Promise<any>;
