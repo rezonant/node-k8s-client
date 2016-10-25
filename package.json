@@ -1,7 +1,7 @@
 {
   "name": "@rezonant/k8s",
   "private": false,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "junjun16818",
   "description": "Node.js client library for Google's Kubernetes Kubectl And API",
   "repository": {
