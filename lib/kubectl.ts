@@ -197,7 +197,7 @@ export class KubectlStore<T>
         return this.command(action, done)
     }
 
-    public apply(name: string, json: Object, flags?, done?: Callback<T>) : Promise<T>
+    public apply(filename : string, flags?, done?: Callback<T>) : Promise<T>
     {
         if( !this.type )
             throw new Error('not a function')
@@ -208,7 +208,23 @@ export class KubectlStore<T>
         }
 
         flags = flags || []
-        const action = ['update',  this.type, name, '--patch='+ JSON.stringify(json)].concat(flags)
+        const action = ['apply',  this.type, '-f', filename].concat(flags)
+
+        return this.command(action, done)
+    }
+
+    public patch(name: string, json: Object, flags?, done?: Callback<T>) : Promise<T>
+    {
+        if( !this.type )
+            throw new Error('not a function')
+        
+        if( _.isFunction(flags) ){
+            done = flags
+            flags = null
+        }
+
+        flags = flags || []
+        const action = ['patch',  this.type, name, '--patch='+ JSON.stringify(json)].concat(flags)
 
         return this.command(action, done)
     }
