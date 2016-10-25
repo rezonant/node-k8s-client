@@ -1,3 +1,4 @@
+
 import { spawn } from 'child_process';
 import * as _ from 'underscore';
 import * as fs from 'fs';
@@ -17,12 +18,21 @@ export class KubectlStore<T>
 
     constructor(type, conf)
     {
+		this.config = conf;
         this.type = type
         this.binary = conf.binary || 'kubectl'
         this.kubeconfig = conf.kubeconfig || ''
         this.namespace = conf.namespace || ''
         this.endpoint = conf.endpoint || ''
     }
+
+	private config;
+
+	private withNamespace(ns): KubectlStore<T> {
+		let config = Object.create(this.config);
+		config.namespace = ns;
+		return new KubectlStore<T>(this.type, config);
+	}
 
     private spawn(args, done)
     {
@@ -394,6 +404,12 @@ export class Kubectl {
 		this.persistentvolumeclaim = new KubectlStore<PersistentVolumeClaim>('pvc', config);
 		this.pv = new KubectlStore<PersistentVolume>('pv', config);
 		this.persistentvolume = new KubectlStore<PersistentVolume>('pv', config);
+	}
+
+	public withNamespace(ns : string) : Kubectl {
+		let config = Object.create(this.config);
+		config.namespace = ns;
+		return new Kubectl(config);
 	}
 
 	pod : KubectlStore<Pod>;
