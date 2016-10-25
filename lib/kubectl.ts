@@ -392,7 +392,7 @@ export class Kubectl {
 		this.no = new KubectlStore<Node>('nodes', config);
 		this.namespace = new KubectlStore<Namespace>('namespaces', config);
 		this.ns = new KubectlStore<Namespace>('namespaces', config);
-		this.deployment = new KubectlStore<Deployment>('deployment', config);
+		this.deployment = new KubectlStore<Deployment>('deployments', config);
 		this.daemonset = new KubectlStore<DaemonSet>('daemonsets', config);
 		this.ds = new KubectlStore<DaemonSet>('daemonsets', config);
 		this.secrets = new KubectlStore<Secret>('secrets', config);
