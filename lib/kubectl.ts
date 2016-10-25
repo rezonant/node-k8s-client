@@ -218,7 +218,7 @@ export class KubectlStore<T>
         }
 
         flags = flags || []
-        const action = ['apply',  this.type, '-f', filename].concat(flags)
+        const action = ['apply', '-f', filename].concat(flags)
 
         return this.command(action, done)
     }
