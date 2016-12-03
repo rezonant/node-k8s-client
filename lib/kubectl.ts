@@ -452,13 +452,18 @@ export class Kubectl {
 	public static connectToCurrentCluster(config : Config): Kubectl {
 
 		let kube = new Kubectl(config);
+		let kubeEndpoint = `http://kubernetes`;
+		let tokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
 
-		var kubeEndpoint = `https://kubernetes`;
-		var kubeToken = fs.readFileSync("/var/run/secrets/kubernetes.io/serviceaccount/token");
+		if (!fs.existsSync(tokenFile))
+			throw new Error(`Token file ${tokenFile} does not exist`);
 
-		kube.command('config set-cluster local --server=https://kubernetes --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt');
+		var kubeToken = fs.readFileSync(tokenFile);
+		
+		kube.command(`config set-cluster local --server=${kubeEndpoint}`);
 		kube.command(`config set-context local --cluster=local --namespace=${config.namespace || 'production'}`); 
-		kube.command(`config set-credentials local --token=${kubeToken}`);
+		kube.command(`config set-credentials local --token='${kubeToken}'`); 
+		kube.command(`config use-context local`);
 
 		return kube;
 	}
